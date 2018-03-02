@@ -1,4 +1,4 @@
-![otto-plus](media/otto-plus.jpg)
+![](../media/otto-plus.jpg)
 
 # otto-2-plus
 
