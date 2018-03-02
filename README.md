@@ -1,0 +1,3 @@
+# otto-timer2
+
+基于otto官方程序使用ServoTimer2库控制的otto机器人代码，避免与VirtualWire库冲突
