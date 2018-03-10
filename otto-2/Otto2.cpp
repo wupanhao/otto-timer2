@@ -80,6 +80,7 @@ void Otto2::_execute(int A[4], int O[4], int T, double phase_diff[4], float step
       
   //-- Execute the final not complete cycle    
   oscillateServos(A,O, T, phase_diff,(float)steps-cycles);
+  detachServos();
 }
 
 void Otto2::_moveServos(int time, int  servo_target[]) {
@@ -103,6 +104,7 @@ void Otto2::_moveServos(int time, int  servo_target[]) {
     for (int i = 0; i < 4; i++) servo[i].SetPosition(servo_target[i]);
   }
   for (int i = 0; i < 4; i++) servo_position[i] = servo_target[i];
+  detachServos();
 }
 
 void Otto2::home(){
