@@ -8,18 +8,20 @@
 #include "Otto2.h"
 #include "Oscillator.h"
 
-void Otto2::init(int YL, int YR, int RL, int RR) {
+void Otto2::init(int YL, int YR, int RL, int RR ,bool foot_reverse) {
   
   servo_pins[0] = YL;
   servo_pins[1] = YR;
   servo_pins[2] = RL;
   servo_pins[3] = RR;
 
-  attachServos();
-  isOttoResting=false;
 
-  
+  _foot_reverse = foot_reverse;
+  isOttoResting=false;
+  attachServos();
   for (int i = 0; i < 4; i++) servo_position[i] = 90;
+
+
 
   //Buzzer & noise sensor pins: 
   // pinBuzzer = Buzzer;
@@ -32,8 +34,14 @@ void Otto2::init(int YL, int YR, int RL, int RR) {
 void Otto2::attachServos(){
     servo[0].attach(servo_pins[0]);
     servo[1].attach(servo_pins[1]);
+    if(_foot_reverse){
+    servo[2].attach(servo_pins[2],true);
+    servo[3].attach(servo_pins[3],true);
+    }
+    else{
     servo[2].attach(servo_pins[2]);
     servo[3].attach(servo_pins[3]);
+      }
 }
 
 void Otto2::detachServos(){
@@ -45,7 +53,7 @@ void Otto2::detachServos(){
 
 
 void Otto2::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
-
+//  T = 2000;
   for (int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
     servo[i].SetA(A[i]);
@@ -55,10 +63,15 @@ void Otto2::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], flo
   double ref=millis();
    for (double x=ref; x<=T*cycle+ref; x=millis()){
      for (int i=0; i<4; i++){
-        yield();
-        servo[i].refresh();
+      if(debug)
+        Serial.print(String("servo[")+String(i)+"]:");
+//        servo[i].refresh();
+        servo[i].refresh_by_time(x - ref);
      }
-
+     if(debug)
+        Serial.println();
+     delay(20);
+     yield();
   }
 }
 
@@ -81,7 +94,6 @@ void Otto2::_execute(int A[4], int O[4], int T, double phase_diff[4], float step
   //-- Execute the final not complete cycle    
   oscillateServos(A,O, T, phase_diff,(float)steps-cycles);
   detachServos();
-
 }
 
 void Otto2::_moveServos(int time, int  servo_target[]) {
@@ -97,8 +109,12 @@ void Otto2::_moveServos(int time, int  servo_target[]) {
 
     for (int iteration = 1; millis() < final_time; iteration++) {
       partial_time = millis() + 10;
-      for (int i = 0; i < 4; i++) servo[i].SetPosition(servo_position[i] + (iteration * increment[i]));
-      while (millis() < partial_time); //pause
+      for (int i = 0; i < 4; i++) 
+        servo[i].SetPosition(servo_position[i] + (iteration * increment[i]));
+
+      yield();
+      while (millis() < partial_time) 
+        yield(); //pause
     }
   }
   else{
@@ -106,7 +122,6 @@ void Otto2::_moveServos(int time, int  servo_target[]) {
   }
   for (int i = 0; i < 4; i++) servo_position[i] = servo_target[i];
   detachServos();
-  yield();
 }
 
 void Otto2::home(){
@@ -168,7 +183,7 @@ void Otto2::walk(float steps, int T, int dir){
   //--      -90 : Walk forward
   //--       90 : Walk backward
   //-- Feet servos also have the same offset (for tiptoe a little bit)
-  int A[4]= {30, 30, 20, 20};
+  int A[4]= {30, 30, 12, 12};
   int O[4] = {0, 0, 4, -4};
   double phase_diff[4] = {0, 0, DEG2RAD(dir * -90), DEG2RAD(dir * -90)};
 
@@ -480,6 +495,3 @@ void Otto2::flapping(float steps, int T, int h, int dir){
   //-- Let's oscillate the servos!
   _execute(A, O, T, phase_diff, steps); 
 }
-
-
-

@@ -1,4 +1,3 @@
-#include <VirtualWire.h>
 
 #include "Otto2p.h"
 Otto2 otto2;
