@@ -20,6 +20,7 @@ void init_sr()
     Serial.println("Ultrasonic sensor:");
 }
 void dance(){
+
   otto2.walk();
   otto2.jump();
   otto2.turn();
@@ -61,7 +62,6 @@ void setup(){
   otto2.init(PIN_YL,PIN_YR,PIN_RL,PIN_RR);
   otto2.home();
   init_sr();
-
   }
 
 void loop(){

@@ -1,6 +1,6 @@
 #ifndef Otto2_h
 #define Otto2_h
-#include "ServoTimer2.h"
+#include "Servo.h"
 #include "Oscillator.h"
 
 //-- Constants
@@ -17,15 +17,24 @@
 #define PIN_Echo    9
 #define PIN_NoiseSensor A6
 
+#ifndef debug
+#define debug 1
+#endif
+
+//#ifndef FOOT_Reverse
+//#define FOOT_Reverse 0
+//#endif
+
 class Otto2{
   public:
-    void init(int YL, int YR, int RL, int RR);
-    //-- Attach & detach functions
-    void attachServos();
-    void detachServos();
-     void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
-    void _moveServos(int time, int  servo_target[]);
-    void home();
+
+  void init(int YL, int YR, int RL, int RR,bool foot_reverse = false);
+  //-- Attach & detach functions
+  void attachServos();
+  void detachServos();
+   void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
+  void _moveServos(int time, int  servo_target[]);
+  void home();
     bool getRestState();
     void setRestState(bool state);
     
@@ -55,6 +64,7 @@ class Otto2{
     float increment[4];
     int pinBuzzer;
     bool isOttoResting;
+    bool _foot_reverse;
   
     void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
   };
